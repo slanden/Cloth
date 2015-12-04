@@ -58,43 +58,47 @@ public class ClothSim : MonoBehaviour
                 //gizmos
                 pGizmos[iter].transform.position = new Vector3(j, i, 0);
 
-                ////horizontal
-                //if (i != 0)
-                //{
-                //    s.p1 = particles[j];
-                //    s.p2 = particles[j + 1];
-                //    springs.Add(s);
-                //}
 
-                //vertical
-                if (j % cols != 0)
+                //horizontal springs
+                if (j != 0)
                 {
                     s.p1 = particles[i * cols + j - 1];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-                    Debug.Log("spring " + (springs.Count-1) + "start: " + s.p1.position + " end: " + s.p2.position);
+                    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
                 }
 
                 //vertical springs
-                if (i % cols != 0)
+                if (i != 0)
                 {
                     s.p1 = particles[(i - 1) * cols + j];
                     s.p2 = particles[i * cols + j];
 
                     springs.Add(s);
-                    Debug.Log("spring " + (springs.Count-1) + "start: " + s.p1.position + " end: " + s.p2.position);
+                    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
 
                 }
 
+
+
                 ////horizontal springs
-                //if (j % cols != cols -1)
+                //if (j % cols != 0)
                 //{
-                //    //s.p1 = particles[i * cols + j - 1];
-                //    //s.p2 = particles[i * cols + j];
+                //    s.p1 = particles[i * cols + j - 1];
+                //    s.p2 = particles[i * cols + j];
+                //    springs.Add(s);
+                //    Debug.Log("spring " + (springs.Count-1) + " start: " + s.p1.position + " end: " + s.p2.position);
+                //}
 
-
+                ////vertical springs
+                //if (i % cols != 0)
+                //{
+                //    s.p1 = particles[(i - 1) * cols + j];
+                //    s.p2 = particles[i * cols + j];
 
                 //    springs.Add(s);
+                //    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
+
                 //}
 
                 iter++;
