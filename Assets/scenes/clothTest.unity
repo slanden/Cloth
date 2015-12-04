@@ -258,10 +258,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343912f8ab1addc449da69e345bf5c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  divisions: 2
+  divisions: 1
   cols: 2
   rows: 2
   particles: []
+  pGizmos: []
+  ParticleGizmo: {fileID: 174284, guid: c1cb01c776dd17c47a3a21d4c1f15c47, type: 2}
   springs: []
 --- !u!4 &1953128304
 Transform:
