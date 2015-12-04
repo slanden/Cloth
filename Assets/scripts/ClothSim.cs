@@ -6,7 +6,12 @@ public class ClothSim : MonoBehaviour
     public int divisions = 0;
     public int cols = 2;
     public int rows = 2;
-    int numVerts = 4;
+    //int numVerts = 4;
+
+    float stiffness;
+    float dampening;
+    float restLength;
+    
     public SParticle[] particles;
 
     public GameObject[] pGizmos;
@@ -50,7 +55,7 @@ public class ClothSim : MonoBehaviour
             for(int j = 0; j < rows; ++j)
             {
                 SParticle p = new SParticle();
-                Spring s = new Spring();
+                //Spring s = new Spring();
 
                 p.position = new Vector3(j, i, 0);
                 particles[iter] = p;
@@ -62,62 +67,46 @@ public class ClothSim : MonoBehaviour
                 //horizontal springs
                 if (j != 0)
                 {
+                    Spring s = new Spring();
+                    s.spring = stiffness;
+                    s.damp = dampening;
+                    s.restLength = this.restLength;
+
                     s.p1 = particles[i * cols + j - 1];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-                    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
+                    //Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
                 }
 
                 //vertical springs
                 if (i != 0)
                 {
+                    Spring s = new Spring();
                     s.p1 = particles[(i - 1) * cols + j];
                     s.p2 = particles[i * cols + j];
 
                     springs.Add(s);
-                    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
+                    //Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
 
                 }
 
-
-
-                ////horizontal springs
-                //if (j % cols != 0)
-                //{
-                //    s.p1 = particles[i * cols + j - 1];
-                //    s.p2 = particles[i * cols + j];
-                //    springs.Add(s);
-                //    Debug.Log("spring " + (springs.Count-1) + " start: " + s.p1.position + " end: " + s.p2.position);
-                //}
-
-                ////vertical springs
-                //if (i % cols != 0)
-                //{
-                //    s.p1 = particles[(i - 1) * cols + j];
-                //    s.p2 = particles[i * cols + j];
-
-                //    springs.Add(s);
-                //    Debug.Log("spring " + (springs.Count - 1) + " start: " + s.p1.position + " end: " + s.p2.position);
-
-                //}
-
-                iter++;
-               
+                iter++;               
             }
+
         }
-
-        
-
-
 
     }
 
     void Update()
     {
         foreach (Spring s in springs)
-        {
-         //   Debug.Log("Draw Line from " + s.p1.position + " to " + s.p2.position);
             Debug.DrawLine(s.p1.position, s.p2.position, Color.white);
+
+        for (int i = 0; i < particles.Length; ++i)
+        {
+            Vector3 acceleration = particles[i].force / particles[i].mass;
+            particles[i].velocity += acceleration * Time.deltaTime;
+            particles[i].position += particles[i].velocity * Time.deltaTime;
         }
     }
 

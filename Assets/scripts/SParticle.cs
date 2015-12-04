@@ -5,8 +5,17 @@ public class SParticle : MonoBehaviour
 {
     public Vector3 position;
     public float velocity;
-    public float acceleration;
+    public Vector3 acceleration;
     public float mass;
     public float momentum;
-    public float force;
+    public Vector3 force;
+    public bool anchor = false;
+
+    public void ApplyGravity()
+    {
+        //gravity
+        acceleration = new Vector3(0, -9.8f, 0);
+
+        force = mass * acceleration;
+    }
 }

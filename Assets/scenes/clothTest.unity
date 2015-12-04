@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 343912f8ab1addc449da69e345bf5c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  divisions: 1
+  divisions: 3
   cols: 2
   rows: 2
   particles: []
