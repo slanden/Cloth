@@ -1,24 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Spring : MonoBehaviour
+public class Spring
 {
     public float spring; // stiffness
     public float damp; // damper
     public float restLength; // rest length
     public SParticle p1, p2;
 
-    void ComputeForce()
+    public void ComputeForce()
     {
         Vector3 dist = p2.position - p1.position;
         float force;
+
         //spring
-        force = -spring * (restLength - dist.magnitude);
+        force = -spring * (restLength - Vector3.Distance(p1.position, p2.position));
 
         //damper
-        damp = -damp * (p1.velocity - p2.velocity);
+        float p1Vel = Vector3.Dot(dist.normalized, p1.velocity);
+        float p2Vel = Vector3.Dot(dist.normalized, p2.velocity);
 
-        force += damp;
+        force += (-damp * (p1Vel - p2Vel));
 
         Vector3 force1 = force * dist.normalized;
         Vector3 force2 = -force1;
