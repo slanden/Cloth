@@ -9,4 +9,5 @@ public class SParticle
     public float mass;
     public Vector3 force;
     public bool anchor = false;
+    
 }

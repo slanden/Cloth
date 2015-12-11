@@ -13,7 +13,7 @@ public class Line : MonoBehaviour
 		lineRender.SetColors(Color.white, Color.white);
 		lineRender.SetWidth(0.05f, 0.05f);
 	}
-	
+
 	void AddVerts(Vector3 pos1, Vector3 pos2)
 	{
 		verts.Add(pos1);

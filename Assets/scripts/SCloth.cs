@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEditor;
 using System.Collections.Generic;
 
 public class SCloth : MonoBehaviour
@@ -6,28 +8,41 @@ public class SCloth : MonoBehaviour
     public int divisions = 0;
     public int cols = 2;
     public int rows = 2;
-	int width = 1;
-	int height = 1;
+    int width = 1;
+    int height = 1;
     public bool setAnchorsMode = false;
-	
+
 
     public float stiffness = 2;
     public float dampening = 1;
     public float restLength = 0.25f;
     public float constMass = 0.5f;
 
+    public Slider stiffnessSlider, damperSlider, restLengthSlider;//, massSlider;
+    public Toggle AnchorModeToggle;
+
     public SParticle[] particles;
     public List<Spring> springs = new List<Spring>();
-	//public List<Line> lines = new List<Line>();
-
-    //public GameObject[] pGizmos;
-    //public GameObject ParticleGizmo;    
+    public List<LineRenderer> springsLines = new List<LineRenderer>();
+    //public List<Line> lines = new List<Line>();
+    public GameObject line;
+    public GameObject particleGizmo;
 
     Vector3 gravity = new Vector3(0, -1, 0);
 
+
     void Awake()
     {
-		
+        if (particleGizmo == null)
+        {
+            particleGizmo = new GameObject();
+            Debug.Log("particleGizmo not set");
+        }
+        particleGizmo = Instantiate(particleGizmo) as GameObject;
+        particleGizmo.name = "NodeMesh";
+        particleGizmo.transform.parent = transform;
+        particleGizmo.SetActive(false);
+
         //determine number of grid points after subdividing
         Subdivide(divisions);
         int totalPoints = rows * cols;
@@ -59,12 +74,6 @@ public class SCloth : MonoBehaviour
                     s.p1 = particles[i * cols + j - 1];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-					
-					/* //make line
-					Line l = new Line();
-					l.InitLineRenderer();
-					l.AddVerts(s.p1.position,s.p2.position);
-					lines.Add(l) */
                 }
 
                 //vertical springs
@@ -78,12 +87,6 @@ public class SCloth : MonoBehaviour
                     s.p1 = particles[(i - 1) * cols + j];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-					
-					/* //make line
-					Line l = new Line();
-					l.InitLineRenderer();
-					l.AddVerts(s.p1.position,s.p2.position);
-					lines.Add(l) */
                 }
 
                 //diagonal right springs
@@ -97,16 +100,10 @@ public class SCloth : MonoBehaviour
                     s.p1 = particles[(i - 1) * cols + j - 1];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-					
-					/* //make line
-					Line l = new Line();
-					l.InitLineRenderer();
-					l.AddVerts(s.p1.position,s.p2.position);
-					lines.Add(l) */
                 }
 
                 //diagonal left springs
-                if (i != 0 && j != cols-1)
+                if (i != 0 && j != cols - 1)
                 {
                     Spring s = new Spring();
                     s.spring = stiffness;
@@ -116,12 +113,6 @@ public class SCloth : MonoBehaviour
                     s.p1 = particles[(i - 1) * cols + j + 1];
                     s.p2 = particles[i * cols + j];
                     springs.Add(s);
-					
-/* 					//make line
-					Line l = new Line();
-					l.InitLineRenderer();
-					l.AddVerts(s.p1.position,s.p2.position);
-					lines.Add(l) */
                 }
 
                 iter++;
@@ -133,49 +124,106 @@ public class SCloth : MonoBehaviour
         particles[totalPoints - 1].anchor = true;
     }
 
-    //this update is supposed to be for setting particle node anchors
-    void Update()
+    void Start()
     {
-            if(setAnchorsMode)
-            {
-                Vector3 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-                Vector3 screenPos = new Vector3(0,0,0);
+        stiffnessSlider.value = stiffness;
+        damperSlider.value = dampening;
+        restLengthSlider.value = restLength;
+        AnchorModeToggle.isOn = setAnchorsMode;
+        //massSlider.value = constMass;
 
-                Debug.Log("mousePos: " + mousePos);
-                Debug.Log("screenPos: " + screenPos);
-                //if a particle is under the mouse cursor, enable particleGizmo
-                foreach(SParticle p in particles)
-                {
-                    screenPos = Camera.main.WorldToScreenPoint(p.position);
-                    Debug.Log("mousePos: " + mousePos);
-                    Debug.Log("screenPos: " + screenPos);
-                    if(Mathf.Abs(Vector3.Magnitude(mousePos - screenPos)) < 1f)
-                    {
-                        //GameObject g = Instantiate(ParticleGizmo, Vector3.zero, Quaternion.identity) as GameObject;
-                        //g.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
-                        //g.transform.parent = gameObject.transform;
-                        //g.transform.position = p.position;
-                        Debug.Log(p.position);
-                        Gizmos.DrawSphere(p.position, 1f);
-                    }
-                }                
+        int count = 0;
+        GameObject sparent = new GameObject();
+        sparent.name = "Springs";
+        foreach (Spring s in springs)
+        {
+            GameObject g = Instantiate(line);
+            g.name = "Spring " + count.ToString();
+            g.transform.SetParent(sparent.transform);
+            LineRenderer l = g.GetComponent<LineRenderer>();
+            l.SetPosition(0, s.p1.position);
+            l.SetPosition(1, s.p2.position);
+            springsLines.Add(l);
+            count++;
+        }
+    }
 
-                //if mouse click, set particle.anchor = true and disable particleGizmo
-            }
+    void OnGUI()
+    {
+        stiffness = stiffnessSlider.value;
+        dampening = damperSlider.value;
+        restLength = restLengthSlider.value;
+        //constMass = massSlider.value;
+        setAnchorsMode = AnchorModeToggle.isOn;
     }
 
     void FixedUpdate()
     {
+        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y,0);
+        //Vector3 mousePos = Input.mousePosition;
+
         //compute particle forces
         foreach (SParticle p in particles)
+        {
             p.force = p.mass * gravity;
 
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(p.position);
+
+            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+            Vector3 offset = p.position - Camera.main.ScreenToWorldPoint(curScreenPoint);
+
+            //Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+
+            //Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+            //p.position = curPosition;
+
+
+            Vector3 nsPos = Camera.main.WorldToScreenPoint(p.position);
+            Vector2 nodeScreenPos = new Vector3(nsPos.x, nsPos.y,0);
+            
+
+            if (Vector3.Distance(p.position, Camera.main.ScreenToWorldPoint(curScreenPoint) ) < 4f )
+            {
+                particleGizmo.SetActive(true);
+                
+                if (Input.GetMouseButton(0))
+                {
+                    p.anchor = true;
+                    //p.position = Camera.main.ScreenToWorldPoint(mousePos);
+                    Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+                    p.position = curPosition;
+                    p.anchor = false;
+                }
+                particleGizmo.transform.position = p.position;
+
+                if(Input.GetMouseButtonDown(1))
+                    p.anchor = true;
+
+                break;
+            }
+            else
+                particleGizmo.SetActive(false);
+
+            
+                
+        }
+            
+
+
+        int e = 0;
         //compute spring forces
         foreach (Spring s in springs)
         {
-            Debug.DrawLine(s.p1.position, s.p2.position, Color.white);
+            s.spring = stiffness;
+            s.damp = dampening;
+            s.restLength = this.restLength;
+            //Debug.DrawLine(s.p1.position, s.p2.position, Color.white);
+            springsLines[e].SetPosition(0, s.p1.position);
+            springsLines[e].SetPosition(1, s.p2.position);
             s.ComputeForce();
+            e++;
         }
+
 
         //integrate motion
         for (int i = 0; i < particles.Length; ++i)
@@ -187,7 +235,36 @@ public class SCloth : MonoBehaviour
                 particles[i].position += particles[i].velocity * Time.fixedDeltaTime;
             }
         }
-		
+
+        //manipulate nodes
+        //if(Input.GetMouseButton(0))
+        //{
+
+        //}
+
+        //if (setAnchorsMode)
+        //{
+        //    Vector2 mousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        //    foreach (SParticle p in particles)
+        //    {
+        //        Vector3 nsPos = Camera.main.WorldToScreenPoint(p.position);
+        //        Vector2 nodeScreenPos = new Vector2(nsPos.x, nsPos.y);
+
+        //        if (Vector3.Distance(nodeScreenPos, mousePos) < 4f)
+        //        {
+        //            particleGizmo.SetActive(true);
+        //            particleGizmo.transform.position = p.position;
+        //            if (Input.GetMouseButtonDown(0))
+        //                p.anchor = true;
+        //            break;
+        //        }
+        //        else
+        //            particleGizmo.SetActive(false);
+        //    }
+
+        //}
+
     }
 
 
