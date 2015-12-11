@@ -159,7 +159,7 @@ public class SCloth : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y,0);
+        //Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y,0);
         //Vector3 mousePos = Input.mousePosition;
 
         //compute particle forces
@@ -168,43 +168,47 @@ public class SCloth : MonoBehaviour
             p.force = p.mass * gravity;
 
             Vector3 screenPoint = Camera.main.WorldToScreenPoint(p.position);
-
-            Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
-            Vector3 offset = p.position - Camera.main.ScreenToWorldPoint(curScreenPoint);
+            Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 
             //Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+            //Vector3 offset = p.position - Camera.main.ScreenToWorldPoint(curScreenPoint);
 
-            //Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
-            //p.position = curPosition;
+            ////Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
+
+            ////Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+            ////p.position = curPosition;
 
 
-            Vector3 nsPos = Camera.main.WorldToScreenPoint(p.position);
-            Vector2 nodeScreenPos = new Vector3(nsPos.x, nsPos.y,0);
+            //Vector3 nsPos = Camera.main.WorldToScreenPoint(particleGizmo.transform.position);
+            //Vector2 nodeScreenPos = new Vector3(nsPos.x, nsPos.y,0);
+
             
 
-            if (Vector3.Distance(p.position, Camera.main.ScreenToWorldPoint(curScreenPoint) ) < 4f )
+            if (Vector3.Distance(screenPoint, mousePos) < 4f)
             {
                 particleGizmo.SetActive(true);
-                
-                if (Input.GetMouseButton(0))
-                {
-                    p.anchor = true;
-                    //p.position = Camera.main.ScreenToWorldPoint(mousePos);
-                    Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
-                    p.position = curPosition;
-                    p.anchor = false;
-                }
                 particleGizmo.transform.position = p.position;
+                //if (Input.GetMouseButton(0))
+                //{
+                //    particleGizmo.transform.position = Camera.main.ScreenToWorldPoint(mousePos);
+                //    p.force += Vector3.Normalize(particleGizmo.transform.position - p.position) * Time.fixedDeltaTime;
+                //}
+                
 
-                if(Input.GetMouseButtonDown(1))
-                    p.anchor = true;
+                //if (Input.GetMouseButtonDown(1))
+                //    p.anchor = true;
 
                 break;
             }
-            else
-                particleGizmo.SetActive(false);
+            //else
+                //particleGizmo.SetActive(false);
 
-            
+            if (Input.GetMouseButton(0) && particleGizmo.activeSelf)
+            {
+                particleGizmo.transform.position = Camera.main.ScreenToWorldPoint(mousePos);
+                //p.force += Vector3.Normalize(particleGizmo.transform.position - p.position) * 2;
+                p.position = Vector3.Lerp(p.position, particleGizmo.transform.position,Time.fixedDeltaTime);
+            }
                 
         }
             
