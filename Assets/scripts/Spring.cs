@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum SpringType { manhattan, structural, shear, bend };
 public class Spring
 {
+    public SpringType springType; //type of spring
     public float spring; // stiffness
     public float damp; // damper
     public float restLength; // rest length

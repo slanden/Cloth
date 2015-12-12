@@ -602,7 +602,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
+  m_BackGroundColor: {r: .147058845, g: .122188598, b: .122188598, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -895,10 +895,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 220168683}
   m_HandleRect: {fileID: 2138460184}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 10
+  m_MinValue: 1
+  m_MaxValue: 2
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1129,12 +1129,12 @@ Light:
   serializedVersion: 6
   m_Type: 1
   m_Color: {r: 1, g: .956862748, b: .839215696, a: 1}
-  m_Intensity: 1
+  m_Intensity: .439999998
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_Strength: 1
     m_Bias: .0500000007
@@ -1571,7 +1571,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 121996303}
   m_HandleRect: {fileID: 174726217}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: .100000001
   m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0
@@ -1886,10 +1886,12 @@ MonoBehaviour:
   cols: 2
   rows: 2
   setAnchorsMode: 0
-  stiffness: 10
-  dampening: 6
+  stiffness: 8
+  dampening: 4
   restLength: 1
-  constMass: .5
+  constMass: .25
+  drag: .5
+  density: 1
   stiffnessSlider: {fileID: 2012117883}
   damperSlider: {fileID: 2024950811}
   restLengthSlider: {fileID: 960285872}
@@ -1897,6 +1899,18 @@ MonoBehaviour:
   springsLines: []
   line: {fileID: 192772, guid: 6b7da8e7f02d8e34f8bddbbfd0f0e093, type: 2}
   particleGizmo: {fileID: 174284, guid: c1cb01c776dd17c47a3a21d4c1f15c47, type: 2}
+  manhattanSpringConst: 2
+  manhattanSpringRestLength: 1
+  manhattanDampConst: 1
+  structuralSpringConst: 2
+  structuralSpringRestLength: 1
+  structuralDampConst: 1
+  shearSpringConst: 2
+  shearSpringRestLength: 1
+  shearDampConst: 1
+  bendSpringConst: 2
+  bendSpringRestLength: 1
+  bendDampConst: 1
 --- !u!4 &1953128304
 Transform:
   m_ObjectHideFlags: 0
@@ -1984,10 +1998,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 325252648}
   m_HandleRect: {fileID: 1742834514}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 10
+  m_MinValue: 1
+  m_MaxValue: 50
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2068,10 +2082,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1609729838}
   m_HandleRect: {fileID: 1896234277}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 9
+  m_MinValue: 1
+  m_MaxValue: 2
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
