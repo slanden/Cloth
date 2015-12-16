@@ -85,7 +85,7 @@ try {
   } while (moar);
   code = code.substring(0, startAsm) + asm + code.substring(endAsm);
   code = code.replace("'use asm'", "'almost asm'");
-} catch(e) { console.log('failed to optimize out Math.fround calls ' + e) }
+} catch(e) { console.log('failed tAo optimize out Math.fround calls ' + e) }
  }
 
     var blob = new Blob([code], { type: 'text/javascript' });
