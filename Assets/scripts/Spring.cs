@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum SpringType { manhattan, structural, shear, bend };
+public enum SpringType { structural, shear, bend };
 public class Spring
 {
     public SpringType springType; //type of spring

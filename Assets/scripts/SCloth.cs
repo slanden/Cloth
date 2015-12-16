@@ -10,8 +10,6 @@ public class SCloth : MonoBehaviour
     public int rows = 2;
     int width = 1;
     int height = 1;
-    public bool setAnchorsMode = false;
-
     
     public float stiffness = 1;
     public float dampening = 1;
@@ -22,7 +20,7 @@ public class SCloth : MonoBehaviour
     public float density = 1f;
 
     public Slider stiffnessSlider, damperSlider, restLengthSlider;//, massSlider;
-    public Toggle AnchorModeToggle;
+    public Slider windSliderX, windSliderY, windSliderZ;
 
     public SParticle[] particles;
     public List<Spring> springs = new List<Spring>();
@@ -34,13 +32,8 @@ public class SCloth : MonoBehaviour
     public GameObject particleGizmo;
     
 
-    Vector3 gravity = new Vector3(0, -1, 0);
-    Vector3 airVelocity = new Vector3(1, 0, 0);
-
-
-    public float manhattanSpringConst;
-    public float manhattanSpringRestLength;
-    public float manhattanDampConst;
+    Vector3 gravity = new Vector3(0, -9.8f, 0);
+    public Vector3 airVelocity = new Vector3(1, 1, -5);
 
     public float structuralSpringConst;
     public float structuralSpringRestLength;
@@ -57,10 +50,13 @@ public class SCloth : MonoBehaviour
     //public GUIText airVelocityX;
     //public GUIText airVelocityY;
     //public GUIText airVelocityZ;
+    public GameObject cutter;
+    //public BoxCollider cutter;
 
 
     void Awake()
     {
+        //instantiate particle gizmo
         if (particleGizmo == null)
         {
             particleGizmo = new GameObject();
@@ -70,6 +66,15 @@ public class SCloth : MonoBehaviour
         particleGizmo.name = "NodeMesh";
         particleGizmo.transform.parent = transform;
         particleGizmo.SetActive(false);
+
+        //instantiate cutter
+        cutter = Instantiate(cutter) as GameObject;
+        //cutterParent.AddComponent<BoxCollider>();
+        cutter.name = "Cutter";
+        cutter.transform.parent = transform;
+        cutter.transform.position = Vector3.zero;
+        //cutter = cutterParent.GetComponent<BoxCollider>();
+        //cutter.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
 
         //determine number of grid points after subdividing
         Subdivide(divisions);
@@ -95,10 +100,10 @@ public class SCloth : MonoBehaviour
                 if (j != 0)
                 {
                     Spring s = new Spring();
-                    s.springType = SpringType.manhattan;
-                    s.spring = stiffness;
-                    s.damp = dampening;
-                    s.restLength = this.restLength;
+                    s.springType = SpringType.structural;
+                    s.spring = structuralSpringConst;
+                    s.damp = structuralDampConst;
+                    s.restLength = structuralSpringRestLength;
 
                     s.p1 = particles[i * cols + j - 1];
                     s.p2 = particles[i * cols + j];
@@ -123,10 +128,10 @@ public class SCloth : MonoBehaviour
                 if (i != 0)
                 {
                     Spring s = new Spring();
-                    s.springType = SpringType.manhattan;
-                    s.spring = stiffness;
-                    s.damp = dampening;
-                    s.restLength = this.restLength;
+                    s.springType = SpringType.structural;
+                    s.spring = structuralSpringConst;
+                    s.damp = structuralDampConst;
+                    s.restLength = structuralSpringRestLength;
 
                     s.p1 = particles[(i - 1) * cols + j];
                     s.p2 = particles[i * cols + j];
@@ -152,9 +157,9 @@ public class SCloth : MonoBehaviour
                 {
                     Spring s = new Spring();
                     s.springType = SpringType.shear;
-                    s.spring = stiffness;
-                    s.damp = dampening;
-                    s.restLength = this.restLength;
+                    s.spring = shearSpringConst;
+                    s.damp = shearDampConst;
+                    s.restLength = shearSpringRestLength;
 
                     s.p1 = particles[(i - 1) * cols + j - 1];
                     s.p2 = particles[i * cols + j];
@@ -165,10 +170,10 @@ public class SCloth : MonoBehaviour
                 if (i != 0 && j != cols - 1)
                 {
                     Spring s = new Spring();
-                    s.springType = SpringType.structural;
-                    s.spring = stiffness;
-                    s.damp = dampening;
-                    s.restLength = this.restLength;
+                    s.springType = SpringType.shear;
+                    s.spring = shearSpringConst;
+                    s.damp = shearDampConst;
+                    s.restLength = shearSpringRestLength;
 
                     s.p1 = particles[(i - 1) * cols + j + 1];
                     s.p2 = particles[i * cols + j];
@@ -179,6 +184,53 @@ public class SCloth : MonoBehaviour
             }
 
         }
+
+        ////bend springs
+        //Spring top = new Spring();
+        //Spring bottom = new Spring();
+        //Spring left = new Spring();
+        //Spring right = new Spring();
+
+        ////horizontal spring length
+
+        //float hBendSpringRestLength = particles[(totalPoints - 1)].position.x -
+        //                              particles[totalPoints - cols].position.x;
+
+        //float vBendSpringRestLength = particles[totalPoints - cols].position.y -
+        //                              particles[0].position.y;
+
+        //top.p1 = particles[(totalPoints - cols)];
+        //top.p2 = particles[totalPoints - 1];
+        //top.springType = SpringType.bend;
+        //top.spring = stiffness;
+        //top.damp = dampening;
+        //top.restLength = hBendSpringRestLength;
+
+        //bottom.p1 = particles[0];
+        //bottom.p2 = particles[cols - 1];
+        //bottom.springType = SpringType.bend;
+        //bottom.spring = stiffness;
+        //bottom.damp = dampening;
+        //bottom.restLength = hBendSpringRestLength;
+
+        //left.p1 = particles[0];
+        //left.p2 = particles[totalPoints - cols];
+        //left.springType = SpringType.bend;
+        //left.spring = stiffness;
+        //left.damp = dampening;
+        //left.restLength = vBendSpringRestLength;
+
+        //right.p1 = particles[cols - 1];
+        //right.p2 = particles[totalPoints - 1];
+        //right.springType = SpringType.bend;
+        //right.spring = stiffness;
+        //right.damp = dampening;
+        //right.restLength = vBendSpringRestLength;
+
+        //springs.Add(top);
+        //springs.Add(bottom);
+        //springs.Add(left);
+        //springs.Add(right);
 
 
         //create triangles
@@ -229,7 +281,10 @@ public class SCloth : MonoBehaviour
         stiffnessSlider.value = stiffness;
         damperSlider.value = dampening;
         restLengthSlider.value = restLength;
-        AnchorModeToggle.isOn = setAnchorsMode;
+
+        windSliderX.value = airVelocity.x;
+        windSliderY.value = airVelocity.y;
+        windSliderZ.value = airVelocity.z;
         //massSlider.value = constMass;
 
         int count = 0;
@@ -253,8 +308,11 @@ public class SCloth : MonoBehaviour
         stiffness = stiffnessSlider.value;
         dampening = damperSlider.value;
         restLength = restLengthSlider.value;
+
+        airVelocity.x = windSliderX.value;
+        airVelocity.y = windSliderY.value;
+        airVelocity.z = windSliderZ.value;
         //constMass = massSlider.value;
-        setAnchorsMode = AnchorModeToggle.isOn;
 
         //airVelocity.x = GUI.HorizontalSlider(new Rect(Screen.width / 2 + 200, Screen.height - 150, 200, 30), airVelocity.x, -50.0f, 50.0f);
         //airVelocity.y = GUI.HorizontalSlider(new Rect(Screen.width / 2 + 200, Screen.height - 100, 200, 30), airVelocity.y, -50.0f, 50.0f);
@@ -275,10 +333,22 @@ public class SCloth : MonoBehaviour
 
     void FixedUpdate()
     {
+        bool gizmoActive = particleGizmo.activeSelf;
+        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
+
         //compute particle forces
         foreach (SParticle p in particles)
             p.force = p.mass * gravity;
 
+        //tearing
+        if (Input.GetMouseButton(1))
+        {
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(cutter.transform.position);
+            Vector3 mouseWorldPos = mousePos;
+            mouseWorldPos.z = screenPoint.z;
+            mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+            cutter.transform.position = mouseWorldPos;
+        }
 
         int e = 0;
         //compute spring forces
@@ -286,25 +356,15 @@ public class SCloth : MonoBehaviour
         {
             switch (s.springType)
             {
-                case SpringType.bend:
-                    s.spring = bendSpringConst * stiffness;
-                    s.damp = bendDampConst * dampening;
-                    restLength = bendSpringRestLength * this.restLength;
-                    break;
-                case SpringType.manhattan:
-                    s.spring = manhattanSpringConst * stiffness;
-                    s.damp = manhattanDampConst * dampening;
-                    restLength = manhattanSpringRestLength * this.restLength;
+                case SpringType.structural:
+                    s.spring = structuralSpringConst * stiffness;
+                    s.damp = structuralDampConst * dampening;
+                    s.restLength = structuralSpringRestLength * this.restLength;
                     break;
                 case SpringType.shear:
                     s.spring = shearSpringConst * stiffness;
                     s.damp = shearDampConst * dampening;
-                    restLength = shearSpringRestLength * this.restLength;
-                    break;
-                case SpringType.structural:
-                    s.spring = structuralSpringConst * stiffness;
-                    s.damp = structuralDampConst * dampening;
-                    restLength = structuralSpringRestLength * this.restLength;
+                    s.restLength = shearSpringRestLength * this.restLength;
                     break;
             }
 
@@ -332,34 +392,25 @@ public class SCloth : MonoBehaviour
             t.p1.force += aeroForce;
             t.p2.force += aeroForce;
             t.p3.force += aeroForce;
-        }
+        }        
 
-
-        bool gizmoActive = particleGizmo.activeSelf;
-        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-
-
-        //integrate motion
+        
+        //integrate motion and input checks
         for (int i = 0; i < particles.Length; ++i)
         {
             Vector3 screenPoint = Camera.main.WorldToScreenPoint(particles[i].position);
             mousePos.z = screenPoint.z;
+            float distanceSqrd = Vector3.SqrMagnitude(screenPoint - mousePos);
 
-            if (Vector3.SqrMagnitude(screenPoint - mousePos) < 4f * 4f)
+            if (distanceSqrd < 4f * 4f)
             {
                 particleGizmo.SetActive(true);
                 particleGizmo.transform.position = particles[i].position;
-                Debug.Log("particle " + i);
+                //Debug.Log("particle " + i + "at position " + particles[i].position);
 
-                if(Input.GetMouseButton(0) && particles[i].animated != true)
+                if (Input.GetMouseButton(0) && particles[i].animated != true)
                 {
                     particles[i].animated = true;
-                }
-                else if (Input.GetMouseButton(0) && particles[i].animated == true)
-                {
-                    Vector3 direction;
-                    direction = Camera.main.ScreenToWorldPoint(mousePos - screenPoint);
-                    particles[i].force += direction;
                 }
 
             }
@@ -368,9 +419,30 @@ public class SCloth : MonoBehaviour
                 particleGizmo.SetActive(false);
                 gizmoActive = false;
             }
+            
+            //dragging
+            if (Input.GetMouseButton(0) && particles[i].animated == true)
+            {
+                Vector3 direction;
+                direction = Camera.main.ScreenToWorldPoint(mousePos - screenPoint);
+                Vector3 newMousePos = new Vector3(mousePos.x, mousePos.y, screenPoint.z);
+                //particles[i].position = Camera.main.ScreenToWorldPoint(newMousePos);
+                particles[i].force += (Camera.main.ScreenToWorldPoint(newMousePos) - particles[i].position) * 800;
+            }
 
             if (!Input.GetMouseButton(0))
                 particles[i].animated = false;
+
+            //anchoring
+            if (Input.GetKeyDown(KeyCode.A) && particles[i].animated || 
+                Input.GetKeyDown(KeyCode.A) && distanceSqrd < 4f * 4f )
+            {
+                if (particles[i].anchor == true)
+                    particles[i].anchor = false;
+                else
+                    particles[i].anchor = true;
+            }
+
 
             //integrate motion (cont.)
             if (particles[i].anchor == false)
@@ -379,6 +451,8 @@ public class SCloth : MonoBehaviour
                 particles[i].velocity += acceleration * Time.fixedDeltaTime;
                 particles[i].position += particles[i].velocity * Time.fixedDeltaTime;
             }
+
+            
         }
         gizmoActive = particleGizmo.activeSelf;
 
@@ -418,25 +492,3 @@ public class SCloth : MonoBehaviour
     }
 
 }
-
-
-
-//if (Input.GetMouseButton(0) && particleGizmo.activeSelf)
-//{
-//    particleGizmo.transform.position = Camera.main.ScreenToWorldPoint(mousePos);
-//    //p.force += Vector3.Normalize(particleGizmo.transform.position - p.position) * 2;
-//    //p.position = Vector3.Lerp(p.position, particleGizmo.transform.position, Time.fixedDeltaTime);
-//}
-
-
-
-
-//if (Input.GetMouseButton(0))
-//{
-//    particleGizmo.transform.position = Camera.main.ScreenToWorldPoint(mousePos);
-//    p.force += Vector3.Normalize(particleGizmo.transform.position - p.position) * Time.fixedDeltaTime;
-//}
-
-
-//if (Input.GetMouseButtonDown(1))
-//    p.anchor = true;
