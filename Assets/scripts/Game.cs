@@ -1,11 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour 
-{	
-	void Update () 
-	{
-		if(Input.GetKeyDown(KeyCode.Escape))
-			Application.Quit();
-	}
+{
+    public Button reset, exit;
+    SCloth clothProgram;
+    
+
+    void Awake()
+    {
+        clothProgram = FindObjectOfType<SCloth>();
+
+        reset.onClick.AddListener(Reset);
+        exit.onClick.AddListener(Exit);
+    }
+
+    void Exit()
+    {
+        Application.Quit();
+    }
+
+    void Reset()
+    {
+        clothProgram.InitCloth();
+    }
 }
