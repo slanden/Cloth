@@ -22,6 +22,6 @@ public class Game : MonoBehaviour
 
     void Reset()
     {
-        //clothProgram.InitCloth();
+        clothProgram.Reset();
     }
 }

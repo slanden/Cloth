@@ -47,7 +47,7 @@ public class SCloth : MonoBehaviour
     public float bendSpringRestLength;
     public float bendDampConst;
     public GameObject cutter;
-
+    private float distanceRangeSqrd = 5f * 5f;
 
     void Awake()
     {
@@ -192,7 +192,7 @@ public class SCloth : MonoBehaviour
             float distanceSqrd = Vector3.SqrMagnitude(screenPoint - mousePos);
 
             //square the right hand side and do the distance check
-            if (distanceSqrd < 4f * 4f)
+            if (distanceSqrd < distanceRangeSqrd)
             {
                 particleGizmo.SetActive(true);
                 particleGizmo.transform.position = particles[i].position;
@@ -225,7 +225,7 @@ public class SCloth : MonoBehaviour
 
             //anchoring
             if (Input.GetKeyDown(KeyCode.A) && particles[i].animated || 
-                Input.GetKeyDown(KeyCode.A) && distanceSqrd < 4f * 4f )
+                Input.GetKeyDown(KeyCode.A) && distanceSqrd < distanceRangeSqrd)
             {
                 if (particles[i].anchor == true)
                     particles[i].anchor = false;
@@ -258,7 +258,7 @@ public class SCloth : MonoBehaviour
         }
     }
 
-    public void InitCloth()
+    void InitCloth()
     {
         //determine number of grid points after subdividing
         Subdivide(divisions);
@@ -458,6 +458,26 @@ public class SCloth : MonoBehaviour
         //set start anchor points
         particles[(totalPoints - cols)].anchor = true;
         particles[totalPoints - 1].anchor = true;
+    }
+
+    public void Reset()
+    {
+        //loop through particles and reset positions
+        int iter = 0;
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < cols; ++j)
+            {
+                particles[iter].position = new Vector3(transform.position.x + j, transform.position.y + i, transform.position.z + 0);
+                particles[iter].velocity = Vector3.zero;               
+
+                iter++;
+            }
+
+        }
+        //set start anchor points
+        particles[(particles.Length - cols)].anchor = true;
+        particles[particles.Length - 1].anchor = true;
     }
 
 
