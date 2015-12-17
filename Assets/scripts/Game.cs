@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class Game : MonoBehaviour 
@@ -23,6 +22,6 @@ public class Game : MonoBehaviour
 
     void Reset()
     {
-        clothProgram.InitCloth();
+        //clothProgram.InitCloth();
     }
 }
